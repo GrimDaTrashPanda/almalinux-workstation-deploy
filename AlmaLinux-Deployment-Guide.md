@@ -27,10 +27,25 @@ If vendor detection fails for some reason, the script logs a warning and continu
 
 RHEL-based distributions split their package ecosystem into tiers, and two of those tiers matter here:
 
-- **EPEL** (Extra Packages for Enterprise Linux) — a Fedora-maintained repo of packages that meet Red Hat's quality bar but aren't included in the base OS. Several tools this script installs (`fastfetch`, `duf`, `tldr`, `glances`) live here.
+- **EPEL** (Extra Packages for Enterprise Linux) — a Fedora-maintained repo of packages that meet Red Hat's quality bar but aren't included in the base OS. Several tools this script installs (`fastfetch`, `duf`, `tldr`, `glances`, `p7zip`) live here.
 - **CRB** (CodeReady Builder) — a repo of build-time dependencies and libraries that many EPEL packages need in order to install cleanly. It's disabled by default and has to be explicitly enabled.
 
 The script installs `epel-release` and enables CRB with `dnf config-manager --set-enabled crb`. The `|| true` at the end means the script won't stop if CRB is already enabled or the command errors for a reason that doesn't actually block the rest of the deployment.
+
+## Phase 2.5: RPM Fusion (Free) — Required for VLC
+
+EPEL deliberately excludes anything touching patent-encumbered multimedia codecs, which means VLC isn't there. RPM Fusion (Free) is the standard third-party repo RHEL-based distros use to fill that gap, and it depends on EPEL already being enabled.
+
+The script installs the release package directly from RPM Fusion's URL:
+
+```bash
+sudo dnf install -y --nogpgcheck \
+  "https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm"
+```
+
+`$(rpm -E %rhel)` resolves to the underlying RHEL version number (10, on AlmaLinux 10), so the same command works unchanged across RHEL-family releases. `--nogpgcheck` is needed for this one install specifically — dnf can't verify a repo's signing key before the package that provides that key is installed. Once this package is in place, the actual `vlc` install in Phase 3 is fully GPG-verified as normal.
+
+The `|| true` means a failure here (e.g. a temporary mirror issue) won't halt the whole deployment — VLC would just fail to install in the next phase, which you'd see clearly in the output.
 
 ## Phase 3: Native Toolkit
 
@@ -46,6 +61,8 @@ This installs the bulk of the daily-driver toolkit in one `dnf install` call:
 | `duf` | Disk usage utility (from EPEL) |
 | `tldr` | Simplified command help pages (from EPEL) |
 | `flatpak` | Sandboxed app runtime |
+| `vlc` | Media playback (from RPM Fusion Free — see Phase 2.5) |
+| `p7zip` / `p7zip-plugins` | Archive extraction/creation, including `.7z` (from EPEL) |
 
 Because this is a single `dnf install -y` call for everything, `dnf` itself handles skipping anything already installed — no extra checks needed in the script.
 

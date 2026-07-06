@@ -70,10 +70,20 @@ sudo dnf config-manager --set-enabled crb || true
 
 echo ""
 
+# ── Phase 2.5: Enable RPM Fusion (Free) ───────────────────────────────────
+# VLC isn't in EPEL — RHEL-based distros exclude it there over codec
+# licensing. RPM Fusion (Free) is the standard source for it, and it
+# depends on EPEL already being enabled above.
+info "Configuring RPM Fusion (Free) repository (required for VLC)..."
+sudo dnf install -y --nogpgcheck \
+  "https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm" || true
+
+echo ""
+
 # ── Phase 3: Native App Layer (DNF Repositories) ──────────────────────────
 info "Installing core system utilities and development tools..."
 
-# Install development groups and standard packages available in AppStream/EPEL
+# Install development groups and standard packages available in AppStream/EPEL/RPM Fusion
 sudo dnf groupinstall -y "Development Tools"
 sudo dnf install -y \
   git \
@@ -82,7 +92,10 @@ sudo dnf install -y \
   fastfetch \
   duf \
   tldr \
-  flatpak
+  flatpak \
+  vlc \
+  p7zip \
+  p7zip-plugins
 
 echo ""
 
