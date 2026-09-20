@@ -26,7 +26,7 @@ Run as your normal user, not root — it calls `sudo` internally where needed.
 
 1. Detects CPU vendor and installs Intel microcode if applicable (AMD microcode is bundled into `linux-firmware` by default)
 2. Enables the EPEL repository and the CodeReady Builder (CRB) repo
-3. Enables the RPM Fusion (Free) repository — required for VLC, which RHEL-based distros exclude from EPEL over codec licensing
+3. Enables the RPM Fusion (Free) repository (codecs; VLC itself now comes from Flathub)
 4. Installs base tooling: Development Tools group, git, firefox, glances, fastfetch, duf, tldr, flatpak, p7zip
 5. Sets `MOZ_ENABLE_WAYLAND=1` for native Firefox Wayland rendering
 6. Adds the Flathub remote
@@ -36,7 +36,7 @@ Run as your normal user, not root — it calls `sudo` internally where needed.
 ## After running
 
 - Log out and back in (applies the Wayland env var)
-- Set the Wayland flag manually in each Chromium browser — `chrome://flags/#ozone-platform-hint`, `brave://flags/#ozone-platform-hint`, `edge://flags/#ozone-platform-hint` — switch to **Wayland**, relaunch. One-time per browser.
+- Set the Wayland flag manually in each Chromium browser — `chrome://flags/#ozone-platform-hint`, `brave://flags/#ozone-platform-hint` — switch to **Wayland**, relaunch. One-time per browser.
 - Press **Super**, search "Update" — confirm the launcher appears
 
 ## Safe to re-run
@@ -46,3 +46,7 @@ Every install step checks for an existing repo file before adding it, and `dnf` 
 ## Why one update script instead of a split workflow
 
 AlmaLinux has no separate "foreign package" tier the way some other distros do — everything here is either an official `dnf`-tracked package or a Flatpak. A single `update-workstation.sh` covers both in one pass, so there's no split-update naming convention to explain here.
+
+## Changing the apps
+
+The app list isn't in this repo. It lives in [clone-panda-msi](https://github.com/GrimDaTrashPanda/clone-panda-msi). Edit `pkglist-flatpak.txt` there and every deploy repo picks it up on its next run.
