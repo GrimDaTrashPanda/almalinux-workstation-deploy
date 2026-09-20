@@ -93,7 +93,6 @@ sudo dnf install -y \
   duf \
   tldr \
   flatpak \
-  vlc \
   p7zip \
   p7zip-plugins
 
@@ -120,32 +119,16 @@ flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.f
 
 echo ""
 
-# ── Phase 6: Third-Party Native Browsers (RPM Repos) ──────────────────────
-info "Configuring official browser repositories..."
-
-# Google Chrome Repository
-if [ ! -f /etc/yum.repos.d/google-chrome.repo ]; then
-  info "Adding Google Chrome repository..."
-  sudo dnf config-manager --add-repo https://dl.google.com/linux/chrome/rpm/stable/x86_64
+# ── Phase 6: App loadout (shared with clone-panda-msi) ───────────────────
+echo "==> Installing app loadout from clone-panda-msi..."
+command -v git &> /dev/null || sudo dnf install -y git
+LOADOUT_DIR="$HOME/.local/share/clone-panda-msi"
+if [ -d "$LOADOUT_DIR/.git" ]; then
+  git -C "$LOADOUT_DIR" pull --ff-only
+else
+  git clone https://github.com/GrimDaTrashPanda/clone-panda-msi.git "$LOADOUT_DIR"
 fi
-
-# Brave Browser Repository
-if [ ! -f /etc/yum.repos.d/brave-browser.repo ]; then
-  info "Adding Brave Browser repository..."
-  sudo dnf config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
-  sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
-fi
-
-# Microsoft Edge Repository
-if [ ! -f /etc/yum.repos.d/microsoft-edge.repo ]; then
-  info "Adding Microsoft Edge repository..."
-  sudo dnf config-manager --add-repo https://packages.microsoft.com/yumrepos/edge
-  sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-fi
-
-info "Installing Chrome, Brave, and Edge via DNF..."
-sudo dnf install -y google-chrome-stable brave-browser microsoft-edge-stable
-
+bash "$LOADOUT_DIR/install-loadout.sh"
 echo ""
 
 # ── Phase 7: Workstation Maintenance Unified Script ───────────────────────

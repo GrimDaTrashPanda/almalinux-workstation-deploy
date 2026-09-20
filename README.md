@@ -1,6 +1,6 @@
 # AlmaLinux Workstation Baseline Deployment
 
-A single, idempotent script that takes a fresh AlmaLinux 10 Workstation install (GNOME) to a fully provisioned baseline: EPEL, native toolkit, Flathub, a full browser stack, Wayland tuning, and a unified update workflow with a GNOME launcher.
+A single, idempotent script that takes a fresh AlmaLinux 10 Workstation install (GNOME) to a fully provisioned baseline: EPEL, base tooling, Flathub, the shared app loadout, Wayland tuning, and a unified update workflow with a GNOME launcher.
 
 Full background and rationale: [AlmaLinux-Deployment-Guide.md](./AlmaLinux-Deployment-Guide.md)
 
@@ -27,10 +27,10 @@ Run as your normal user, not root — it calls `sudo` internally where needed.
 1. Detects CPU vendor and installs Intel microcode if applicable (AMD microcode is bundled into `linux-firmware` by default)
 2. Enables the EPEL repository and the CodeReady Builder (CRB) repo
 3. Enables the RPM Fusion (Free) repository — required for VLC, which RHEL-based distros exclude from EPEL over codec licensing
-4. Installs the native toolkit: Development Tools group, git, firefox, glances, fastfetch, duf, tldr, flatpak, vlc, p7zip
+4. Installs base tooling: Development Tools group, git, firefox, glances, fastfetch, duf, tldr, flatpak, p7zip
 5. Sets `MOZ_ENABLE_WAYLAND=1` for native Firefox Wayland rendering
 6. Adds the Flathub remote
-7. Adds official repos for Chrome, Brave, and Edge, then installs all three
+7. Installs the app loadout from clone-panda-msi (its Flathub list, plus Discord, Kdenlive, OBS, Meld, and Telegram as Flatpaks)
 8. Creates a single unified `update-workstation.sh` script and matching GNOME launcher
 
 ## After running
